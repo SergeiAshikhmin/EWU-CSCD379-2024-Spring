@@ -15,7 +15,7 @@
         <v-card-text>
           The word was: <strong>{{ game.secretWord }}</strong>
         </v-card-text>
-        <v-btn variant="outlined" @click="game.startNewGame()">
+        <v-btn variant="outlined" @click="gameReset()">
           <v-icon size="large" class="mr-2"> mdi-restart </v-icon> Restart Game
         </v-btn>
       </v-alert>
@@ -26,8 +26,11 @@
           <v-icon class="mr-2" > mdi-account </v-icon> {{ nameUserNameDialog }}
         </v-chip>
         <v-chip color="secondary" class="mr-2">
-          <v-icon class="mr-2"> mdi-timer </v-icon> 5s
-        </v-chip>
+          <v-icon class="mr-2"> mdi-timer </v-icon> 
+          <v-card-text>
+            {{stopwatch.minutes}} : {{ stopwatch.seconds }}
+          </v-card-text>
+      </v-chip>
       </v-card-text>
 
       <GameBoardGuess v-for="(guess, i) of game.guesses" :key="i" :guess="guess" />
@@ -61,7 +64,9 @@ import nuxtStorage from "nuxt-storage";
 import Axios from 'axios'
 import type { Player } from "../scripts/player";
 import { useStopwatch } from 'vue-timer-hook';
+import {ref, watch} from 'vue'
 
+const stopwatch = useStopwatch(0, true);
 const router = useRouter();
 const game = reactive(new Game());
 game.startNewGame();
@@ -85,7 +90,6 @@ onMounted(() => {
 
   window.addEventListener("keyup", onKeyup);
 
-
   // Assignment 3 Task 2
   // Check if user name is stored in local storage
   checkUserNameLocalStorage();
@@ -95,6 +99,10 @@ onMounted(() => {
   
 });
 
+function gameReset(){
+  stopwatch.reset()
+  game.startNewGame();
+}
 
 onUnmounted(() => {
   window.removeEventListener("keyup", onKeyup);
@@ -146,15 +154,17 @@ function postScore() {
     }else{
       attempts = game.guesses.length + 5;
     }
+    var seconds = stopwatch.minutes.value * 60 + stopwatch.seconds.value;
     Axios.post("Player/AddPlayer", {
       Name: nameUserNameDialog,
       GameCount: 1,
       AverageAttempts: attempts,
-      //AverageSecondsPerGame: stopwatch.seconds.value
+      AverageSecondsPerGame: seconds
     });
 }
 watch(() => game.gameState, (value) => {
-  if(value == GameState.Won || value == GameState.Lost){
+  if(value != GameState.Playing){
+    stopwatch.pause();
     postScore();
   }
 });
