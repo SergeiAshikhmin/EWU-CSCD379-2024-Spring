@@ -1,17 +1,20 @@
 <template>
-	<v-app>
-		<v-container>
-			<v-row>
-				<v-col cols="12">
-					<h1>Home Page, right? </h1>
-          <v-btn @click="router.push('/')"> Home Page </v-btn>
-				</v-col>
-			</v-row>
-
-			<div ref="gameContainer"></div>
-
-		</v-container>
-	</v-app>
+  <v-app>
+    <v-container class="d-flex justify-center align-center mt-5">
+      <v-row>
+        <v-col cols="12">
+          <h1 class="display-1 text-center">Welcome to the Game!</h1>
+        </v-col>
+        <v-col cols="12" class="d-flex justify-center">
+          <div ref="gameContainer" style="width: 800px; height: 600px; margin: 0 auto;"></div>
+        </v-col>
+        <v-col cols="12" class="d-flex justify-center">
+          <v-btn @click="router.push('/')" color="secondary"> Home Page </v-btn>
+          <v-btn @click="togglePause" class="ml-1" color="primary"> {{ isPaused ? 'Resume' : 'Pause' }}</v-btn>
+        </v-col>
+      </v-row>
+    </v-container>
+  </v-app>
 </template>
 
 
@@ -22,6 +25,18 @@ import { Engine, Actor, Color, CollisionType, vec } from "excalibur";
 const router = useRouter();
 
 const gameContainer = ref<HTMLDivElement | null>(null);
+const isPaused = ref(false);
+
+const togglePause = () => {
+  if (game) {
+    if (isPaused.value) {
+      game.start();
+    } else {
+      game.stop();
+    }
+    isPaused.value = !isPaused.value;
+  }
+};
 
 let game: Engine | null = null;
 
@@ -136,9 +151,9 @@ onMounted(() => {
 
     var intersection = ev.contact.mtv.normalize();
 
-    if(!colliding) {
+    if (!colliding) {
       colliding = true;
-      if(Math.abs(intersection.x) > Math.abs(intersection.y)) {
+      if (Math.abs(intersection.x) > Math.abs(intersection.y)) {
         ball.vel.x *= -1;
       }
       else {
@@ -153,10 +168,12 @@ onMounted(() => {
 
   ball.on("exitviewport", () => {
     alert("Game over!");
-  
+
   })
 
   game?.start();
+
+  
 });
 
 onUnmounted(() => {
