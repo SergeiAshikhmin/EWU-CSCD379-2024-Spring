@@ -1,5 +1,5 @@
 <template>
-	<v-page>
+	<v-app>
 		<v-container>
 			<v-row>
 				<v-col cols="12">
@@ -7,5 +7,11 @@
 				</v-col>
 			</v-row>
 		</v-container>
-	</v-page>
+	</v-app>
 </template>
+
+
+<script setup lang="ts">
+
+
+</script>
