@@ -27,39 +27,33 @@ const router = useRouter();
 const gameContainer = ref<HTMLDivElement | null>(null);
 const isPaused = ref(false);
 
-const togglePause = () => {
-  if (game) {
-    if (isPaused.value) {
-      game.start();
-    } else {
-      game.stop();
-    }
-    isPaused.value = !isPaused.value;
-  }
-};
-
 let game: Engine | null = null;
+let colliding = false;
 
 onMounted(() => {
+
+startGame();
+
+});
+
+onUnmounted(() => {
+  if (game) {
+    game.stop();
+    if (gameContainer.value && gameContainer.value.firstChild) {
+      gameContainer.value.removeChild(gameContainer.value.firstChild);
+    }
+  }
+});
+
+function startGame() {
   if (gameContainer.value) {
-    const canvas = document.createElement("canvas");
-    canvas.width = 800;
-    canvas.height = 600;
+    const canvas = createCanvas(800, 600);
     gameContainer.value.appendChild(canvas);
-    game = new Engine({
-      canvasElement: canvas,
-      width: 800,
-      height: 600,
-    });
+
+    game = createGame(canvas);
   }
 
-  const paddle = new Actor({
-    x: 150,
-    y: game.drawHeight - 40,
-    width: 200,
-    height: 20,
-    color: Color.Chartreuse,
-  });
+  const paddle = createPaddle();
 
   paddle.body.collisionType = CollisionType.Fixed;
   game?.add(paddle);
@@ -67,6 +61,88 @@ onMounted(() => {
   game?.input.pointers.primary.on("move", (evt) => {
     paddle.pos.x = evt.worldPos.x;
   });
+
+  const ball = createBall();
+  game?.add(ball);
+
+
+
+  const bricks = createBricks();
+
+  // On collision remove the brick, bounce the ball
+  colliding = false;
+  ball.on("collisionstart", function (ev) {
+    if (bricks.indexOf(ev.other) > -1) {
+      // kill removes an actor from the current scene
+      // therefore it will no longer be drawn or updated
+      ev.other.kill();
+
+      // Increase ball speed with each killed brick 
+      ball.vel = ball.vel.scale(1.2);
+    }
+
+    var intersection = ev.contact.mtv.normalize();
+
+    if (!colliding) {
+      colliding = true;
+      if (Math.abs(intersection.x) > Math.abs(intersection.y)) {
+        ball.vel.x *= -1;
+      }
+      else {
+        ball.vel.y *= -1;
+      }
+    }
+  });
+
+  ball.on("collisionend", () => {
+    colliding = false;
+  })
+
+  ball.on("exitviewport", () => {
+    console.log("Game over!");
+    restartGame();
+  })
+
+
+  game?.start();
+}
+
+function restartGame() {
+  if (game) {
+    game.stop();
+    if (gameContainer.value && gameContainer.value.firstChild) {
+      gameContainer.value.removeChild(gameContainer.value.firstChild);
+    }
+  }
+  startGame();
+}
+
+function createCanvas(width: number, height: number): HTMLCanvasElement {
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+  return canvas;
+}
+
+function createGame(canvas: HTMLCanvasElement): Engine {
+  return new Engine({
+    canvasElement: canvas,
+    width: 800,
+    height: 600,
+  });
+}
+
+function createPaddle(): Actor {
+  return new Actor({
+    x: 150,
+    y: game?.drawHeight - 40,
+    width: 200,
+    height: 20,
+    color: Color.Chartreuse,
+  });
+}
+
+function createBall(): Actor {
 
   const ball = new Actor({
     x: 100,
@@ -81,7 +157,6 @@ onMounted(() => {
   }, 1000);
 
   ball.body.collisionType = CollisionType.Passive;
-  game?.add(ball);
 
   ball.on("postupdate", () => {
     // If the ball collides with the left side
@@ -103,6 +178,10 @@ onMounted(() => {
     }
   });
 
+  return ball;
+}
+
+function createBricks(): Actor[] {
   // Build Bricks
 
   // Padding between bricks
@@ -140,49 +219,18 @@ onMounted(() => {
     game?.add(brick);
   });
 
-  // On collision remove the brick, bounce the ball
-  let colliding = false;
-  ball.on("collisionstart", function (ev) {
-    if (bricks.indexOf(ev.other) > -1) {
-      // kill removes an actor from the current scene
-      // therefore it will no longer be drawn or updated
-      ev.other.kill();
-    }
+  return bricks;
+}
 
-    var intersection = ev.contact.mtv.normalize();
-
-    if (!colliding) {
-      colliding = true;
-      if (Math.abs(intersection.x) > Math.abs(intersection.y)) {
-        ball.vel.x *= -1;
-      }
-      else {
-        ball.vel.y *= -1;
-      }
-    }
-  });
-
-  ball.on("collisionend", () => {
-    colliding = false;
-  })
-
-  ball.on("exitviewport", () => {
-    alert("Game over!");
-
-  })
-
-  game?.start();
-
-  
-});
-
-onUnmounted(() => {
+const togglePause = () => {
   if (game) {
-    game.stop();
-    if (gameContainer.value && gameContainer.value.firstChild) {
-      gameContainer.value.removeChild(gameContainer.value.firstChild);
+    if (isPaused.value) {
+      game.start();
+    } else {
+      game.stop();
     }
+    isPaused.value = !isPaused.value;
   }
-});
+};
 
 </script>
