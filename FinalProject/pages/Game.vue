@@ -5,6 +5,25 @@
         <v-col cols="12">
           <h1 class="display-1 text-center">Welcome to the Game!</h1>
         </v-col>
+        <v-col cols="6" class="d-flex justify-center">
+          <!-- Game stats -->
+          <v-icon>mdi-heart</v-icon> {{ hearts }}
+          <v-icon>mdi-star</v-icon> 0
+        </v-col>
+        <v-col cols="6">
+          <!-- <v-row>
+            <v-col cols="12">
+              <v-icon>mdi-account</v-icon> Player 1
+            </v-col>
+            <v-col cols="12">
+              <v-icon>mdi-timer</v-icon> 00:00
+            </v-col>
+          </v-row> -->
+          <v-btn> <v-icon>mdi-account</v-icon> Player </v-btn>
+          <v-btn>
+            <v-icon>mdi-timer</v-icon> {{ stopWatch.seconds }}
+          </v-btn>
+        </v-col>
         <v-col cols="12" class="d-flex justify-center">
           <div ref="gameContainer" style="width: 800px; height: 600px; margin: 0 auto;"></div>
         </v-col>
@@ -21,6 +40,10 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from "vue";
 import { Engine, Actor, Color, CollisionType, vec } from "excalibur";
+import { StopWatch } from "../scripts/stopWatch";
+
+const stopWatch = new StopWatch();
+const hearts = ref(3);
 
 const router = useRouter();
 
@@ -32,7 +55,10 @@ let colliding = false;
 
 onMounted(() => {
 
-startGame();
+  stopWatch.start();
+  console.log("Game Page Mounted")
+  console.log("Seconds: ", stopWatch.seconds)
+  startGame();
 
 });
 
@@ -100,6 +126,12 @@ function startGame() {
 
   ball.on("exitviewport", () => {
     console.log("Game over!");
+    hearts.value -= 1;
+    if (hearts.value === 0) {
+      alert("Game Over!");
+      hearts.value = 3;
+    }
+    
     restartGame();
   })
 
@@ -143,6 +175,8 @@ function createPaddle(): Actor {
 }
 
 function createBall(): Actor {
+
+
 
   const ball = new Actor({
     x: 100,
