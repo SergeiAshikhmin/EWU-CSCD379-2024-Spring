@@ -16,7 +16,7 @@ public class GameService(AppDbContext Db)
                 Name = x.Name,
                 Lives = x.Lives,
                 Score = x.Score,
-                Time = x.Time
+                SecondsPlayed = x.SecondsPlayed
             });
         
         return await query.ToListAsync();

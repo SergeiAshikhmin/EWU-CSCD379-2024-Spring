@@ -6,5 +6,5 @@ public class Game
     public string Name { get; set; } = null!;
     public int Lives { get; set; }
     public int Score { get; set; }
-    public DateTimeOffset Time { get; set; }
+    public int SecondsPlayed { get; set; }
 }
