@@ -84,7 +84,7 @@ function startGame() {
     paddle.pos.x = evt.worldPos.x;
   });
 
-  const ball = createBall();
+  let ball = createBall();
   const maxSpeed = 300;
   let speedIncreaseFactor = 1.2;
 
@@ -141,9 +141,14 @@ function startGame() {
     if (hearts.value === 0) {
       alert("Game Over!");
       hearts.value = 3;
+      score.value = 0;
+      stopWatch.reset();
+      restartGame();
+    } else {
+      ball.pos = vec(100, 300);
     }
     
-    restartGame();
+    
   })
 
 
