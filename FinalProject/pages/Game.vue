@@ -6,19 +6,10 @@
           <h1 class="display-1 text-center">Welcome to the Game!</h1>
         </v-col>
         <v-col cols="6" class="d-flex justify-center">
-          <!-- Game stats -->
           <v-icon>mdi-heart</v-icon> {{ hearts }}
-          <v-icon>mdi-star</v-icon> 0
+          <v-icon>mdi-star</v-icon> {{ score }}
         </v-col>
         <v-col cols="6">
-          <!-- <v-row>
-            <v-col cols="12">
-              <v-icon>mdi-account</v-icon> Player 1
-            </v-col>
-            <v-col cols="12">
-              <v-icon>mdi-timer</v-icon> 00:00
-            </v-col>
-          </v-row> -->
           <v-btn> <v-icon>mdi-account</v-icon> Player </v-btn>
           <v-btn>
             <v-icon>mdi-timer</v-icon> {{ stopWatch.seconds }}
@@ -44,6 +35,7 @@ import { StopWatch } from "../scripts/stopWatch";
 
 const stopWatch = new StopWatch();
 const hearts = ref(3);
+const score = ref(0);
 
 const router = useRouter();
 
@@ -89,6 +81,9 @@ function startGame() {
   });
 
   const ball = createBall();
+  const maxSpeed = 300;
+  let speedIncreaseFactor = 1.2;
+
   game?.add(ball);
 
 
@@ -104,7 +99,19 @@ function startGame() {
       ev.other.kill();
 
       // Increase ball speed with each killed brick 
-      ball.vel = ball.vel.scale(1.2);
+      let newVelocity = ball.vel.scale(speedIncreaseFactor);
+      if(newVelocity.x > maxSpeed) {
+        newVelocity = newVelocity.normalize().scale(maxSpeed);
+      }
+      ball.vel = newVelocity;
+
+      const remainingBricks = bricks.filter((b) => !b.isKilled()).length;
+      if(remainingBricks < 4) {
+        speedIncreaseFactor = 1.05;
+      }
+
+      // Increment score
+      score.value += 100;
     }
 
     var intersection = ev.contact.mtv.normalize();
