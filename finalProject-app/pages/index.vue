@@ -10,6 +10,9 @@
                         <v-col cols="3" class="ml-auto mr-auto">
                             <v-btn block color="dark" @click="router.push('/game')">Start Game</v-btn>
                         </v-col>
+                        <v-col cols="3" class="ml-auto mr-auto">
+                            <v-btn block color="dark" @click="router.push('/leaderboard')">Leaderboard</v-btn>
+                        </v-col>
                     </v-row>
                 </v-card>
             </v-container>

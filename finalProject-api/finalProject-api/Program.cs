@@ -18,6 +18,19 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
 
+var AllOrigins = "AllOrigins";
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(AllOrigins,
+        options =>
+        {
+            options.AllowAnyOrigin()
+                .AllowAnyMethod()
+                .AllowAnyHeader();
+        });
+});
+
 // My services
 builder.Services.AddScoped<GameService>();
 
@@ -39,4 +52,5 @@ using (var scope = app.Services.CreateScope())
 
 app.UseHttpsRedirection();
 app.MapControllers();
+app.UseCors(AllOrigins);
 app.Run();
