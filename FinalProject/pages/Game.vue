@@ -145,6 +145,8 @@ function restartGame() {
     if (gameContainer.value && gameContainer.value.firstChild) {
       gameContainer.value.removeChild(gameContainer.value.firstChild);
     }
+
+    stopWatch.reset();
   }
   startGame();
 }

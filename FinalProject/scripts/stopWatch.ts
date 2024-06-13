@@ -19,4 +19,13 @@ export class StopWatch {
 			this.seconds.value++;
 		}, 1000);
 	}
+
+	public stop(): void {
+		clearInterval(this.interval);
+		this.isRunning = false;
+	}
+
+	public reset(): void {
+		this.seconds.value = 0;
+	}
 }
