@@ -6,10 +6,10 @@
           <h1 class="display-1 text-center">Welcome to the Game!</h1>
         </v-col>
         <v-col cols="6" class="d-flex justify-center">
-          <v-icon>mdi-heart</v-icon> {{ hearts }}
-          <v-icon>mdi-star</v-icon> {{ score }}
+          <v-chip color="red" class="mx-2">  <v-icon class="mr-1">mdi-heart</v-icon> {{ hearts }}</v-chip>
+          <v-chip color="yellow" class="mx-2"> <v-icon class="mr-1">mdi-star</v-icon> {{ score }}</v-chip>
         </v-col>
-        <v-col cols="6">
+        <v-col cols="6" class="d-flex justify-end">
           <v-btn> <v-icon>mdi-account</v-icon> Player </v-btn>
           <v-btn>
             <v-icon>mdi-timer</v-icon> {{ stopWatch.seconds }}
