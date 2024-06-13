@@ -71,10 +71,9 @@ function startGame() {
     game = createGame(canvas);
   }
 
-  const paddle = createPaddle();
+  let paddle = createPaddle(200);
 
-  paddle.body.collisionType = CollisionType.Fixed;
-  game?.add(paddle);
+
 
   game?.input.pointers.primary.on("move", (evt) => {
     paddle.pos.x = evt.worldPos.x;
@@ -173,14 +172,19 @@ function createGame(canvas: HTMLCanvasElement): Engine {
   });
 }
 
-function createPaddle(): Actor {
-  return new Actor({
+function createPaddle(width: number): Actor {
+  let paddle =  new Actor({
     x: 150,
     y: game?.drawHeight - 40,
-    width: 200,
+    width: width,
     height: 20,
     color: Color.Chartreuse,
   });
+
+  paddle.body.collisionType = CollisionType.Fixed;
+  game?.add(paddle);
+
+  return paddle;
 }
 
 function createBall(): Actor {
