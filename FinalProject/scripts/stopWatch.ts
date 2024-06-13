@@ -1,31 +1,46 @@
 export class StopWatch {
-	public isRunning: boolean;
-	public seconds = ref(0);
-	public interval: number;
+  private startTime: number;
+  public elapsed = ref(0); // Make elapsed time a reactive reference
+  private running: boolean = false;
 
-	constructor() {
-		this.isRunning = false;
-		this.interval = 0;
-	}
+  constructor() {
+    this.startTime = 0;
+  }
 
-	public start(): void {
+  start() {
+    if (!this.running) {
+      this.startTime = performance.now() - this.elapsed.value;
+      this.running = true;
+      requestAnimationFrame(this.update.bind(this));
+    }
+  }
 
-		if (this.isRunning) {
-			return;
-		}
+  stop() {
+    if (this.running) {
+      this.elapsed.value = performance.now() - this.startTime;
+      this.running = false;
+    }
+  }
 
-		this.isRunning = true;
-		this.interval = setInterval(() => {
-			this.seconds.value++;
-		}, 1000);
-	}
+  reset() {
+    this.stop();
+    this.elapsed.value = 0;
+  }
 
-	public stop(): void {
-		clearInterval(this.interval);
-		this.isRunning = false;
-	}
+  update() {
+    if (this.running) {
+      this.elapsed.value = performance.now() - this.startTime;
+      requestAnimationFrame(this.update.bind(this));
+    }
+  }
 
-	public reset(): void {
-		this.seconds.value = 0;
-	}
+  get time() {
+    const totalSeconds = this.elapsed.value / 1000;
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = Math.floor(totalSeconds % 60);
+    const milliseconds = Math.floor(
+      (totalSeconds - Math.floor(totalSeconds)) * 1000
+    );
+    return { minutes, seconds, milliseconds };
+  }
 }
