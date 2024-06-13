@@ -10,7 +10,7 @@
           <v-chip color="yellow" class="mx-2" size="large"> <v-icon class="mr-1">mdi-star</v-icon> {{ score }}</v-chip>
         </v-col>
         <v-col cols="6" class="d-flex justify-end">
-          <v-btn class="mx-2" color="primary"> <v-icon>mdi-account</v-icon> Player </v-btn>
+          <v-btn @click="showDialog = true" class="mx-2" color="primary"> <v-icon>mdi-account</v-icon> {{ userName }} </v-btn>
           <v-chip color="secondary" class="mx-2" size="large">
             <v-icon class="mr-1">mdi-timer</v-icon>
             <span class="timer-text">{{ formattedTime }}</span>
@@ -25,6 +25,8 @@
         </v-col>
       </v-row>
     </v-container>
+
+    <UserNameDialog v-model:show="showDialog" v-model:userName="userName" @okay="saveName" />
   </v-app>
 </template>
 
@@ -33,6 +35,11 @@
 import { ref, onMounted, onUnmounted } from "vue";
 import { Engine, Actor, Color, CollisionType, vec } from "excalibur";
 import { StopWatch } from "../scripts/stopWatch";
+import UserNameDialog from "~/components/UserNameDialog.vue";
+
+// User Name Dialog
+const showDialog = ref(false);
+const userName = ref("Player");
 
 const stopWatch = new StopWatch();
 const hearts = ref(3);
@@ -53,9 +60,10 @@ const formattedTime = computed(() => {
 
 onMounted(() => {
 
-  stopWatch.start();
-  console.log("Game Page Mounted")
+  // stopWatch.start();
+  // console.log("Game Page Mounted")
   startGame();
+  stopWatch.start();
 
 });
 
@@ -282,8 +290,20 @@ const togglePause = () => {
 
 watch(hearts, (newVal) => {
   if (newVal <= 0) {
-    console.log("Game Over!");
     game?.stop();
+    showDialog.value = true;
+
+  }
+});
+
+watch(showDialog, (newVal) => {
+  if (newVal) {
+    game?.stop();
+    stopWatch.stop();
+  }
+  else {
+    game?.start();
+    stopWatch.start();
   }
 });
 
