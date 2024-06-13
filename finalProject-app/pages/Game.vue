@@ -6,7 +6,7 @@
           <h1 class="display-1 text-center">Welcome to the Game!</h1>
         </v-col>
         <v-col cols="6" class="d-flex justify-start">
-          <v-chip color="red" class="mx-2" size="large">  <v-icon class="mr-1">mdi-heart</v-icon> {{ hearts }}</v-chip>
+          <v-chip color="red" class="mx-2" size="large"> <v-icon class="mr-1">mdi-heart</v-icon> {{ hearts }}</v-chip>
           <v-chip color="yellow" class="mx-2" size="large"> <v-icon class="mr-1">mdi-star</v-icon> {{ score }}</v-chip>
         </v-col>
         <v-col cols="6" class="d-flex justify-end">
@@ -104,13 +104,13 @@ function startGame() {
 
       // Increase ball speed with each killed brick 
       let newVelocity = ball.vel.scale(speedIncreaseFactor);
-      if(newVelocity.x > maxSpeed) {
+      if (newVelocity.x > maxSpeed) {
         newVelocity = newVelocity.normalize().scale(maxSpeed);
       }
       ball.vel = newVelocity;
 
       const remainingBricks = bricks.filter((b) => !b.isKilled()).length;
-      if(remainingBricks < 4) {
+      if (remainingBricks < 4) {
         speedIncreaseFactor = 1.05;
       }
 
@@ -131,25 +131,7 @@ function startGame() {
     }
   });
 
-  ball.on("collisionend", () => {
-    colliding = false;
-  })
 
-  ball.on("exitviewport", () => {
-    console.log("Game over!");
-    hearts.value -= 1;
-    if (hearts.value === 0) {
-      alert("Game Over!");
-      hearts.value = 3;
-      score.value = 0;
-      stopWatch.reset();
-      restartGame();
-    } else {
-      ball.pos = vec(100, 300);
-    }
-    
-    
-  })
 
 
   game?.start();
@@ -183,7 +165,7 @@ function createGame(canvas: HTMLCanvasElement): Engine {
 }
 
 function createPaddle(width: number): Actor {
-  let paddle =  new Actor({
+  let paddle = new Actor({
     x: 150,
     y: game?.drawHeight - 40,
     width: width,
@@ -198,9 +180,6 @@ function createPaddle(width: number): Actor {
 }
 
 function createBall(): Actor {
-
-
-
   const ball = new Actor({
     x: 100,
     y: 300,
@@ -234,6 +213,15 @@ function createBall(): Actor {
       ball.vel.y = ballSpeed.y;
     }
   });
+
+  ball.on("collisionend", () => {
+    colliding = false;
+  })
+
+  ball.on("exitviewport", () => {
+    hearts.value -= 1;
+    ball.pos = vec(100, 300);
+  })
 
   return ball;
 }
@@ -283,21 +271,32 @@ const togglePause = () => {
   if (game) {
     if (isPaused.value) {
       game.start();
+      stopWatch.start();
     } else {
       game.stop();
+      stopWatch.stop();
     }
     isPaused.value = !isPaused.value;
   }
 };
 
+watch(hearts, (newVal) => {
+  if (newVal <= 0) {
+    console.log("Game Over!");
+    game?.stop();
+  }
+});
+
 </script>
 
 <style scoped>
-.v-chip {
+.v-chip
+{
   transition: all 0.3s ease;
 }
 
-.timer-text {
+.timer-text
+{
   font-family: 'Courier New', Courier, monospace;
   font-weight: bold;
 }
