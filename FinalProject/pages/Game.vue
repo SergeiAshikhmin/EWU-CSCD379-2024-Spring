@@ -1,17 +1,17 @@
 <template>
   <v-app>
-    <v-container class="d-flex justify-center align-center mt-5">
+    <v-container class="d-flex justify-center align-center mt-5" style="max-width: 800px;">
       <v-row>
         <v-col cols="12">
           <h1 class="display-1 text-center">Welcome to the Game!</h1>
         </v-col>
-        <v-col cols="6" class="d-flex justify-center">
+        <v-col cols="6" class="d-flex justify-start">
           <v-chip color="red" class="mx-2">  <v-icon class="mr-1">mdi-heart</v-icon> {{ hearts }}</v-chip>
           <v-chip color="yellow" class="mx-2"> <v-icon class="mr-1">mdi-star</v-icon> {{ score }}</v-chip>
         </v-col>
         <v-col cols="6" class="d-flex justify-end">
-          <v-btn> <v-icon>mdi-account</v-icon> Player </v-btn>
-          <v-btn>
+          <v-btn class="mx-2" color="primary"> <v-icon>mdi-account</v-icon> Player </v-btn>
+          <v-btn class="mx-2" color="secondary">
             <v-icon>mdi-timer</v-icon> {{ stopWatch.seconds }}
           </v-btn>
         </v-col>
@@ -19,8 +19,8 @@
           <div ref="gameContainer" style="width: 800px; height: 600px; margin: 0 auto;"></div>
         </v-col>
         <v-col cols="12" class="d-flex justify-center">
-          <v-btn @click="router.push('/')" color="secondary"> Home Page </v-btn>
-          <v-btn @click="togglePause" class="ml-1" color="primary"> {{ isPaused ? 'Resume' : 'Pause' }}</v-btn>
+          <v-btn @click="router.push('/')" class="mx-1" color="primary"> Home Page </v-btn>
+          <v-btn @click="togglePause" class="mx-1" color="secondary"> {{ isPaused ? 'Resume' : 'Pause' }}</v-btn>
         </v-col>
       </v-row>
     </v-container>
